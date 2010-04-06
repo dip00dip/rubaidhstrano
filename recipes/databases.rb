@@ -20,6 +20,41 @@ namespace :db do
     rails_env = fetch(:rails_env, 'production')
     get "#{latest_release}/db/#{rails_env}-data.sql.bz2", "db/#{rails_env}-data.sql.bz2"
   end
+
+  desc "Creates the database.yml configuration file in shared path."
+  task :setup, :except => { :no_release => true } do
+
+    default_template = <<-EOF
+    base: &base
+      adapter: sqlite3
+      timeout: 5000
+    development:
+      database: #{shared_path}/db/development.sqlite3
+      <<: *base
+    test:
+      database: #{shared_path}/db/test.sqlite3
+      <<: *base
+    production:
+      database: #{shared_path}/db/production.sqlite3
+      <<: *base
+    EOF
+
+    location = fetch(:template_dir, "config/deploy") + '/database.yml.erb'
+    template = File.file?(location) ? File.read(location) : default_template
+
+    config = ERB.new(template)
+
+    run "mkdir -p #{shared_path}/db" 
+    run "mkdir -p #{shared_path}/config" 
+    put config.result(binding), "#{shared_path}/config/database.yml"
+  end
+
+  desc <<-DESC
+    [internal] Updates the symlink for database.yml file to the just deployed release.
+  DESC
+  task :symlink, :except => { :no_release => true } do
+    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml" 
+  end
 end
 
 on :load do
@@ -31,6 +66,12 @@ on :load do
     before "deploy:migrations", "deploy:web:disable"
     after  "deploy:migrations", "deploy:web:enable"
   end
+
+  if fetch(:skip_db_setup, true)
+    after "deploy:setup", "db:setup"
+  end
+
+  after "deploy:finalize_update", "db:symlink"
 end
 
 # Note the dependency this code creates on mysqldump and bzip2
