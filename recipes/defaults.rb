@@ -28,6 +28,7 @@ set :build_gems,                        true
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
 set :compress_assets,                   true
+set :enable_delayed_job,                false
 
 # SSH options
 ssh_options[:forward_agent] = true
