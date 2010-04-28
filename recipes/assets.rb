@@ -31,7 +31,7 @@ namespace :assets do
     tar = fetch(:tar, "tar")
     rails_env = fetch(:rails_env, "production")
 
-    run "if -d [ #{shared_assets_path}; then cd #{shared_assets_path} && #{tar} cjf #{rails_env}-assets.tar.bz2 #{asset_directories.join(" ")}; fi"
+    run "if [ -d #{shared_assets_path} ]; then cd #{shared_assets_path} && #{tar} cjf #{rails_env}-assets.tar.bz2 #{asset_directories.join(" ")}; fi"
   end
 
   task :download, :roles => [ :app, :web ], :except => { :no_release => true } do
