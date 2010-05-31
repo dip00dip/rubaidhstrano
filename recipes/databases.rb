@@ -20,7 +20,8 @@ namespace :db do
     rails_env = fetch(:rails_env, 'production')
     get "#{latest_release}/db/#{rails_env}-data.sql.bz2", "db/#{rails_env}-data.sql.bz2"
   end
-
+  
+  # TODO: Ought to use the databases_type config option here
   desc "Creates the database.yml configuration file in shared path."
   task :setup, :except => { :no_release => true } do
 
@@ -74,6 +75,10 @@ on :load do
   after "deploy:finalize_update", "db:symlink"
 end
 
-# Note the dependency this code creates on mysqldump and bzip2
-depend :remote, :command, 'mysqldump'
+# Note the dependency this code creates on mysqldump/pg_dump and bzip2  
+if fetch(:database_type, "mysql") == "mysql"
+  depend :remote, :command, 'mysqldump'
+else
+  depend :remote, :command, 'pg_dump'
+end
 depend :remote, :command, 'bzip2'

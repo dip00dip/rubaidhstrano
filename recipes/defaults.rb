@@ -29,6 +29,7 @@ set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
 set :compress_assets,                   true
 set :enable_delayed_job,                false
+set :database_type,                     "mysql"
 
 # SSH options
 ssh_options[:forward_agent] = true
