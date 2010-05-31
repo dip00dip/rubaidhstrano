@@ -20,7 +20,7 @@ namespace :db do
     rails_env = fetch(:rails_env, 'production')
     get "#{latest_release}/db/#{rails_env}-data.sql.bz2", "db/#{rails_env}-data.sql.bz2"
   end
-  
+
   # TODO: Ought to use the databases_type config option here
   desc "Creates the database.yml configuration file in shared path."
   task :setup, :except => { :no_release => true } do
@@ -45,8 +45,8 @@ namespace :db do
 
     config = ERB.new(template)
 
-    run "mkdir -p #{shared_path}/db" 
-    run "mkdir -p #{shared_path}/config" 
+    run "mkdir -p #{shared_path}/db"
+    run "mkdir -p #{shared_path}/config"
     put config.result(binding), "#{shared_path}/config/database.yml"
   end
 
@@ -54,11 +54,19 @@ namespace :db do
     [internal] Updates the symlink for database.yml file to the just deployed release.
   DESC
   task :symlink, :except => { :no_release => true } do
-    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml" 
+    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   end
 end
 
 on :load do
+  # Note the dependency this code creates on mysqldump/pg_dump and bzip2
+  if fetch(:database_type, "mysql") == "mysql"
+    depend :remote, :command, 'mysqldump'
+  else
+    depend :remote, :command, 'pg_dump'
+  end
+  depend :remote, :command, 'bzip2'
+
   if fetch(:backup_database_before_migrations, false)
     before "deploy:migrate", "db:backup"
   end
@@ -75,10 +83,3 @@ on :load do
   after "deploy:finalize_update", "db:symlink"
 end
 
-# Note the dependency this code creates on mysqldump/pg_dump and bzip2  
-if fetch(:database_type, "mysql") == "mysql"
-  depend :remote, :command, 'mysqldump'
-else
-  depend :remote, :command, 'pg_dump'
-end
-depend :remote, :command, 'bzip2'
