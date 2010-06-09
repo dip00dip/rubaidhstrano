@@ -11,19 +11,19 @@ namespace :db do
         cmd << "--password='#{abc['password']}'" unless abc['password'].blank?
         cmd << abc['database']
         cmd << " | bzip2 > #{RAILS_ROOT}/db/#{RAILS_ENV}-data.sql.bz2"
-        sh cmd.flatten.join ' '  
+        sh cmd.flatten.join ' '
       when 'postgresql'
-        if abc['password'].blank? 
+        if abc['password'].blank?
           cmd = ['pg_dump']
         else
-          cmd = ["export PGPASSWORD='#{abc['password']}';pg_dump"] 
+          cmd = ["export PGPASSWORD='#{abc['password']}';pg_dump"]
         end
         cmd << "--host='#{abc['host']}'" unless abc['host'].blank?
         cmd << "--port='#{abc['port']}'" unless abc['port'].blank?
         cmd << "--username='#{abc['username'].blank? ? 'root' : abc['username']}'"
         cmd << abc['database']
-        cmd << " | bzip2 > #{RAILS_ROOT}/db/#{RAILS_ENV}-data.sql.bz2"  
-        sh cmd.flatten.join ' '  
+        cmd << " | bzip2 > #{RAILS_ROOT}/db/#{RAILS_ENV}-data.sql.bz2"
+        sh cmd.flatten.join ' '
       else
         raise "Task not supported by '#{abc['adapter']}'."
       end
@@ -40,23 +40,23 @@ TEXT
       abc = ActiveRecord::Base.configurations[RAILS_ENV]
       case abc['adapter']
       when 'mysql'
-        cmd = ["bzcat #{RAILS_ROOT}/db/#{source_env}-data.sql.bz2 | mysql"]
+        cmd = ["bzcat #{RAILS_ROOT.gsub(' ', '\ ')}/db/#{source_env}-data.sql.bz2 | mysql"]
         cmd << "--host='#{abc['host']}'" unless abc['host'].blank?
         cmd << "--user='#{abc['username'].blank? ? 'root' : abc['username']}'"
         cmd << "--password='#{abc['password']}'" unless abc['password'].blank?
         cmd << abc['database']
         sh cmd.flatten.join ' '
       when 'postgresql'
-        if abc['password'].blank? 
-          cmd = ['bzcat #{RAILS_ROOT}/db/#{source_env}-data.sql.bz2 | psql']
+        if abc['password'].blank?
+          cmd = ["bzcat #{RAILS_ROOT.gsub(' ', '\ ')}/db/#{source_env}-data.sql.bz2 | psql"]
         else
-          cmd = ["export PGPASSWORD='#{abc['password']}';bzcat #{RAILS_ROOT}/db/#{source_env}-data.sql.bz2 | psql"] 
+          cmd = ["export PGPASSWORD='#{abc['password']}';bzcat #{RAILS_ROOT.gsub(' ', '\ ')}/db/#{source_env}-data.sql.bz2 | psql"]
         end
         cmd << "--host='#{abc['host']}'" unless abc['host'].blank?
         cmd << "--port='#{abc['port']}'" unless abc['port'].blank?
         cmd << "--username='#{abc['username'].blank? ? 'root' : abc['username']}'"
         cmd << abc['database']
-        sh cmd.flatten.join ' '  
+        sh cmd.flatten.join ' '
       else
         raise "Task not supported by '#{abc['adapter']}'."
       end
