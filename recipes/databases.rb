@@ -22,10 +22,10 @@ namespace :db do
   end
 
   desc "Notify the user if there are pending migrations"
-  task :notify_if_pending_migrations, :roles => :db, :only => { :primary => true } do      
+  task :notify_if_pending_migrations, :roles => :db, :only => { :primary => true } do
     rubaidh_run_rake "db:notify_if_pending_migrations"
   end
-  
+
   # TODO: Ought to use the databases_type config option here
   desc "Creates the database.yml configuration file in shared path."
   task :setup, :except => { :no_release => true } do
@@ -85,6 +85,9 @@ on :load do
     after "deploy:setup", "db:setup"
   end
 
-  after "deploy:finalize_update", "db:symlink"
+  # TODO: coonfig for this
+  if false
+    after "deploy:finalize_update", "db:symlink"
+  end
 end
 
