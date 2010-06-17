@@ -1,4 +1,25 @@
-namespace :db do
+namespace :db do    
+  
+  desc "Check to see if there are any pending migrations"
+  task :notify_if_pending_migrations => :environment do
+    pending_migrations = ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
+
+    if pending_migrations.any? 
+      puts
+      puts
+      puts ""
+      puts "  \033[1;33m****************************************************************\033[0m"
+      puts "  \033[1;33m* WARNING: You have #{pending_migrations.size} pending migrations *\033[0m"
+      puts "  \033[1;33m*****************************************************************\033[0m"
+      puts "You have #{pending_migrations.size} pending migrations:"
+      pending_migrations.each do |pending_migration|
+        puts '  \033[1;33m  %4d %s\033[0m' % [pending_migration.version, pending_migration.name]
+      end
+      puts "  \033[1;33mExecute 'cap <environment> deploy:migrate' to run these migrations.\033[0m"
+      puts ""
+    end
+  end
+  
   namespace :backup do
     desc "Dumps the database for the current environment into db/env-data.sql.bz2."
     task :dump => :environment do

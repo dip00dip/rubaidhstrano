@@ -21,6 +21,11 @@ namespace :db do
     get "#{latest_release}/db/#{rails_env}-data.sql.bz2", "db/#{rails_env}-data.sql.bz2"
   end
 
+  desc "Notify the user if there are pending migrations"
+  task :notify_if_pending_migrations, :roles => :db, :only => { :primary => true } do      
+    rubaidh_run_rake "db:notify_if_pending_migrations"
+  end
+  
   # TODO: Ought to use the databases_type config option here
   desc "Creates the database.yml configuration file in shared path."
   task :setup, :except => { :no_release => true } do
