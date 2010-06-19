@@ -12,6 +12,15 @@ namespace :deploy do
     run_locally "jammit"
     top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
   end
+
+  # re-linking for config files on public repos
+  desc "Re-link config files"
+  task :link_config, :roles => [:app] do
+    config_files = fetch(:config_files, {})
+    config_files.each do |k,v|
+      link Hash[k,v]
+    end
+  end
 end
 
 namespace :assets do
@@ -72,4 +81,9 @@ on :load do
     depend :remote, :command, "java"
     before 'deploy:finalize_update', 'assets:compress'
   end
+end
+
+def link(link)
+  source, target = link.keys.first, link.values.first
+  run "ln -nfs #{target} #{source}"
 end

@@ -99,7 +99,7 @@ on :load do
     after "deploy:setup", "db:setup"
   end
 
-  # TODO: coonfig for this
+  # TODO: config for this, or merge into general-purpose linking
   if false
     after "deploy:finalize_update", "db:symlink"
   end
