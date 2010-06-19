@@ -7,7 +7,7 @@ namespace :deploy do
 
   desc 'Bundle and minify the JS and CSS files'
   task :precache_assets, :roles => [:app] do
-    root_path = File.expand_path(File.dirname(__FILE__) + '/../..')
+    root_path = File.expand_path(File.dirname(__FILE__) + '/../../../..')
     assets_path = "#{root_path}/public/assets"
     run_locally "jammit"
     top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
