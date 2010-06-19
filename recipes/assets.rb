@@ -1,6 +1,19 @@
 set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
 
+namespace :deploy do
+  # TODO: Merge into assets namespace
+  # TODO: Add dependency checking
+
+  desc 'Bundle and minify the JS and CSS files'
+  task :precache_assets, :roles => [:app] do
+    root_path = File.expand_path(File.dirname(__FILE__) + '/../..')
+    assets_path = "#{root_path}/public/assets"
+    run_locally "jammit"
+    top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
+  end
+end
+
 namespace :assets do
   desc "Compress javascripts and stylesheets"
   task :compress, :except => { :no_release => true } do
