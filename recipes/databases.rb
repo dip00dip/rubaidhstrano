@@ -1,4 +1,18 @@
 namespace :db do
+  # If you want to automatically run populations on every deploy
+  # after 'deploy:symlink', 'db:populate'
+  # Or you may want to update migrations and run populations
+  # after 'deploy:symlink', 'db:migrate_and_populate'
+  desc "Populate seed data using http://github.com/ffmike/db-populate"
+  task :populate, :roles => [ :db ], :only => { :primary => true } do
+    rubaidh_run_rake "db:populate"
+  end
+
+  desc "Migrate and populate seed data using http://github.com/ffmike/db-populate"
+  task :migrate_and_populate, :roles => [ :db ], :only => { :primary => true } do
+    rubaidh_run_rake "db:migrate_and_populate"
+  end
+
   desc <<-DESC
     Back up the database from the deployment environment. This task dumps the
     MySQL database in the current deployment environment out to an SQL dump
