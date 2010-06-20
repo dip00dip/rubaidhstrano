@@ -1,17 +1,8 @@
 set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
-
-namespace :deploy do
-
-  # re-linking for config files on public repos
-  desc "Re-link config files"
-  task :link_config, :roles => [:app] do
-    config_files = fetch(:config_files, {})
-    config_files.each do |k,v|
-      link Hash[k,v]
-    end
-  end
-end
+# config files to re-link  
+# supply a hash of desired_location => real_location pairs
+set :config_files, {"#{current_path}/config/database.yml" => "#{shared_path}/config/database.yml"}
 
 namespace :assets do
   desc "Compress javascripts and stylesheets using YUI"
@@ -45,7 +36,18 @@ namespace :assets do
       end
     end
   end
-
+  
+  namespace :files do
+    # re-linking for config files on public repos
+    desc "Re-link config files"
+    task :symlink, :roles => [:app] do
+      config_files = fetch(:config_files, {})
+      config_files.each do |k,v|
+        link Hash[k,v]
+      end
+    end
+  end
+  
   desc "Create a backup of all the shared assets"
   task :backup, :roles => [ :app, :web ], :except => { :no_release => true } do
     tar = fetch(:tar, "tar")
@@ -66,7 +68,8 @@ namespace :assets do
 end
 
 after 'deploy:setup',           'assets:directories:create'
-after 'deploy:finalize_update', 'assets:directories:symlink'
+after 'deploy:finalize_update', 'assets:directories:symlink'   
+after 'deploy:finalize_update', 'assets:files:symlink'
 
 # Add the assets directories to the list of dependencies we check for.
 on :load do

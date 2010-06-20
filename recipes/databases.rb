@@ -69,12 +69,6 @@ namespace :db do
     put config.result(binding), "#{shared_path}/config/database.yml"
   end
 
-  desc <<-DESC
-    [internal] Updates the symlink for database.yml file to the just deployed release.
-  DESC
-  task :symlink, :except => { :no_release => true } do
-    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
-  end
 end
 
 on :load do
@@ -97,11 +91,6 @@ on :load do
 
   if fetch(:skip_db_setup, true)
     after "deploy:setup", "db:setup"
-  end
-
-  # TODO: config for this, or merge into general-purpose linking
-  if false
-    after "deploy:finalize_update", "db:symlink"
   end
 end
 
