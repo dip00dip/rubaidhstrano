@@ -27,7 +27,8 @@ set :disable_web_during_migrations,     true
 set :build_gems,                        true
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
-set :compress_assets,                   true
+# compress_assets: :jammit, :yui, :none   
+set :compress_assets,                   :jammit
 set :enable_delayed_job,                false
 set :database_type,                     "mysql"
 

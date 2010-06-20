@@ -2,16 +2,6 @@ set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
 
 namespace :deploy do
-  # TODO: Merge into assets namespace
-  # TODO: Add dependency checking
-
-  desc 'Bundle and minify the JS and CSS files'
-  task :precache_assets, :roles => [:app] do
-    root_path = File.expand_path(File.dirname(__FILE__) + '/../../../..')
-    assets_path = "#{root_path}/public/assets"
-    run_locally "jammit"
-    top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
-  end
 
   # re-linking for config files on public repos
   desc "Re-link config files"
@@ -24,9 +14,17 @@ namespace :deploy do
 end
 
 namespace :assets do
-  desc "Compress javascripts and stylesheets"
+  desc "Compress javascripts and stylesheets using YUI"
   task :compress, :except => { :no_release => true } do
     rubaidh_run_rake "assets:compress"
+  end
+
+  desc 'Bundle and minify the JS and CSS files using Jammit'
+  task :precache_assets, :roles => [:app], :except => { :no_release => true } do
+    root_path = File.expand_path(File.dirname(__FILE__) + '/../../../..')
+    assets_path = "#{root_path}/public/assets"
+    run_locally "jammit"
+    top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
   end
 
   namespace :directories do
@@ -76,11 +74,19 @@ on :load do
     depend :remote, :directory, File.join(shared_assets_path, dir)
     depend :remote, :command, fetch(:tar, "tar")
   end
-
-  if fetch(:compress_assets, false)
+  
+  # check dependencies and set callback for asset deployment strategy 
+  compress_assets = fetch(:compress_assets, :none)
+  if compress_assets == :yui
     depend :remote, :command, "java"
     before 'deploy:finalize_update', 'assets:compress'
+  end    
+  if compress_assets == :jammit
+    depend :remote, :gem, "jammit"
+    depend :local, :command, "jammit"
+    after 'deploy:symlink', 'deploy:precache_assets'
   end
+  
 end
 
 def link(link)
