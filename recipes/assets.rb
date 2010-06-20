@@ -2,7 +2,7 @@ set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
 # config files to re-link  
 # supply a hash of desired_location => real_location pairs
-set :config_files, {"#{current_path}/config/database.yml" => "#{shared_path}/config/database.yml"}
+set(:config_files) {{"#{current_path}/config/database.yml" => "#{shared_path}/config/database.yml"}}
 
 namespace :assets do
   desc "Compress javascripts and stylesheets using YUI"
@@ -79,12 +79,11 @@ on :load do
   end
   
   # check dependencies and set callback for asset deployment strategy 
-  compress_assets = fetch(:compress_assets, :none)
-  if compress_assets == :yui
+  case fetch(:compress_assets, :none)
+  when :yui
     depend :remote, :command, "java"
     before 'deploy:finalize_update', 'assets:compress'
-  end    
-  if compress_assets == :jammit
+  when :jammit
     depend :remote, :gem, "jammit"
     depend :local, :command, "jammit"
     after 'deploy:symlink', 'deploy:precache_assets'
