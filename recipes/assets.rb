@@ -1,8 +1,10 @@
 set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
-# config files to re-link  
-# supply a hash of desired_location => real_location pairs
-set(:config_files) {{"#{current_path}/config/database.yml" => "#{shared_path}/config/database.yml"}}
+# config files to re-link
+# supply a hash of desired_location => real_location pairs   
+# We do this before finalize_update (so that db config will be available to after finalize_update)
+#  so use latest_release rather than current_path in building paths
+set(:config_files) {{"#{latest_release}/config/database.yml" => "#{shared_path}/config/database.yml"}}
 
 namespace :assets do
   desc "Compress javascripts and stylesheets using YUI"
@@ -36,7 +38,7 @@ namespace :assets do
       end
     end
   end
-  
+
   namespace :files do
     # re-linking for config files on public repos
     desc "Re-link config files"
@@ -47,7 +49,7 @@ namespace :assets do
       end
     end
   end
-  
+
   desc "Create a backup of all the shared assets"
   task :backup, :roles => [ :app, :web ], :except => { :no_release => true } do
     tar = fetch(:tar, "tar")
@@ -68,8 +70,8 @@ namespace :assets do
 end
 
 after 'deploy:setup',           'assets:directories:create'
-after 'deploy:finalize_update', 'assets:directories:symlink'   
-after 'deploy:finalize_update', 'assets:files:symlink'
+after 'deploy:finalize_update', 'assets:directories:symlink'
+before 'deploy:finalize_update', 'assets:files:symlink'
 
 # Add the assets directories to the list of dependencies we check for.
 on :load do
@@ -77,8 +79,8 @@ on :load do
     depend :remote, :directory, File.join(shared_assets_path, dir)
     depend :remote, :command, fetch(:tar, "tar")
   end
-  
-  # check dependencies and set callback for asset deployment strategy 
+
+  # check dependencies and set callback for asset deployment strategy
   case fetch(:compress_assets, :none)
   when :yui
     depend :remote, :command, "java"
@@ -86,9 +88,9 @@ on :load do
   when :jammit
     depend :remote, :gem, "jammit"
     depend :local, :command, "jammit"
-    after 'deploy:symlink', 'deploy:precache_assets'
+    after 'deploy:symlink', 'assets:precache_assets'
   end
-  
+
 end
 
 def link(link)
