@@ -12,4 +12,6 @@ on :load do
   if fetch(:build_gems, false)
     after "deploy:update_code", "gems:build"
   end
-end
+end           
+
+# TODO: Handle Isolate as well

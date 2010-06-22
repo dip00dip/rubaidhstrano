@@ -1,10 +1,8 @@
 = Rubaidhstrano
 
-We have a bunch of deployment-related ... stuff kicking around and I'm fed up
-copying it from one project to the next. Particularly when I change/improve
-the recipes as I go and those changes don't get to filter back to previous
-projects automatically. This plugin (or hopefully, one day, gem!) attempts to
-rectify that by collecting all these recipes and support tasks together.
+Rubaidhstrano started out as Graeme Matheison's collection of deployment-related
+stuff. This version collects his recipes together with some of my own, and
+bakes in my opinions instead of his.
 
 == Contents
 
@@ -21,6 +19,9 @@ We've supplied a bunch of sensible defaults to required options:
 * We use Passenger for deployment, nobody needs to do any sudoing and, by
   default everything runs on a single host.
 
+* We use jammit for asset compression by default (you can also switch to
+the embedded yuicompressor if you prefer).
+
 * Check for all the possible (default) ssh keys, and forward our ssh-agent to
   the remote machine. This means you can clone the repository from GitHub
   using your own SSH key instead of a shared deployment one.
@@ -33,7 +34,7 @@ values.
 
 There is a mixture of Capistrano and Rake tasks to allow the database on the
 deployment environment to be backed up, downloaded and restored into another
-environment.
+environment. These tasks work with either MySQL or PostgreSQL databases.
 
 There are a few useful use cases for these tasks.
 
@@ -70,7 +71,7 @@ inside Apache and life is much easier. :-) If you've also seen the light then
 you can switch Capistrano to use the Passenger deployment strategy with one
 line:
 
-    set :deployment_strategy, :passenger
+    set :daemon_strategy, :passenger
 
 Of course, the defaults already set this, so you probably don't need to worry
 about it. :-)
@@ -126,6 +127,13 @@ shared as so:
     set :asset_directories, ['public/paintings', 'public/pdfs']
 
 Each directory is relative to +RAILS_ROOT+.
+
+Its also common to keep some configuration files only on the production server,
+and to re-link them at each deployment. For example, you might manage your database.yml
+out of band, so it's not in your git repo. By default we'll re-link the database.yml;
+just override the :config_files setting to change this:
+
+  set(:config_files) {{"#{latest_release}/config/database.yml" => "#{shared_path}/config/database.yml"}}
 
 ==== Duplicating production assets to your local environment
 
@@ -185,7 +193,46 @@ though, I hope!).  If you want to disable this behaviour, do:
 
 and it'll quit noising up your GitHub feed.
 
+=== Revision checking
+
+Ever waste your time deploying because you'd committed changes but not pushed
+them back to the origin repo? No more. Just add this to your deployment recipe:
+
+    before "deploy", "deploy:check_revision"
+
+=== Migration checking
+
+Similarly, you can protect yourself from forgetting to run migrations after
+deployment with this task:
+
+    after "deploy:symlink", "db:notify_if_pending_migrations"
+
+=== Cron management
+
+If you use the +whenever+ gem to manage your cron jobs as versioned code, you
+can update the server cron file on deploy:
+
+    after "deploy:symlink", "cron:update"
+
+=== Default data
+
+If you use the +db-populate+ gem to handle seed data, you might find these
+tasks helpful:
+
+after "deploy:finalize_update", "db:populate"
+after 'deploy:finalize_update', 'db:migrate_and_populate'   
+
+=== Delayed Jobs
+   
+Background task management via the +delayed_job+ gem is also simple:
+
+    set :enable_delayed_job, :true
+    
+This depends on having monit on the server to manage the delayed_job daemon.
+
 == Thanks
+
+Thanks to Graeme Mathieson for the original rubaidhstrano.
 
 Some of the code has been borrowed from other sources. The multistage
 deployment code was borrowed from the capistrano-ext gem by Jamis Buck.
@@ -195,4 +242,5 @@ Craig Webster's simple_deployment provided inspiration for the asset backup,
 and I'm pretty sure Craig fixed a number of issues in this plugin's previous
 incarnation, +rubaidh_platform+. Thanks, Craig!
 
-Copyright (c) 2009 Rubaidh Ltd, released under the MIT license
+Copyright (c) 2010 Lark Group, Inc., released under the MIT license
+Portions copyright (c) 2009 Rubaidh Ltd, released under the MIT license
