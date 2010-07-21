@@ -1,7 +1,7 @@
 set :asset_directories, []
 set(:shared_assets_path) { File.join(shared_path, 'assets') }
 # config files to re-link
-# supply a hash of desired_location => real_location pairs   
+# supply a hash of desired_location => real_location pairs
 # We do this before finalize_update (so that db config will be available to after finalize_update)
 #  so use latest_release rather than current_path in building paths
 set(:config_files) {{"#{latest_release}/config/database.yml" => "#{shared_path}/config/database.yml"}}
@@ -86,7 +86,7 @@ on :load do
     depend :remote, :command, "java"
     before 'deploy:finalize_update', 'assets:compress'
   when :jammit
-    depend :remote, :gem, "jammit"
+    depend :remote, :gem, :jammit, ">=0.4.4"
     depend :local, :command, "jammit"
     after 'deploy:symlink', 'assets:precache_assets'
   end
