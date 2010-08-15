@@ -10,8 +10,8 @@ namespace :tags do
   task :repository, :role => :db, :only => { :primary => true } do
     release_name = fetch(:release_name)
 
-    run_locally "git tag release-#{release_name}"
-    run_locally "git push #{git_remote} release-#{release_name}"
+    run_locally "git tag #{stage}-release-#{release_name}"
+    run_locally "git push #{git_remote} #{stage}-release-#{release_name}"
   end
 end
 

@@ -186,7 +186,8 @@ add the following to your +config/deploy.rb+:
 
 Every time a release happens, a tag will be created in your local git
 repository with the release name (which, by default, is of the format
-yyyymmddhhmmss, eg 20090522054102) and pushes that tag out (nothing else,
+stage-release-yyyymmddhhmmss, eg production-release-20090522054102)
+and pushes that tag out (nothing else,
 though, I hope!).  If you want to disable this behaviour, do:
 
     set :tag_on_deploy, false
@@ -220,14 +221,14 @@ If you use the +db-populate+ gem to handle seed data, you might find these
 tasks helpful:
 
 after "deploy:finalize_update", "db:populate"
-after 'deploy:finalize_update', 'db:migrate_and_populate'   
+after 'deploy:finalize_update', 'db:migrate_and_populate'
 
 === Delayed Jobs
-   
+
 Background task management via the +delayed_job+ gem is also simple:
 
     set :enable_delayed_job, :true
-    
+
 This depends on having monit on the server to manage the delayed_job daemon.
 
 == Thanks
