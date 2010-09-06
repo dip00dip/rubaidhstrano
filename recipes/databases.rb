@@ -2,14 +2,15 @@ namespace :db do
   # If you want to automatically run populations on every deploy
   # after 'deploy:symlink', 'db:populate'
   # Or you may want to update migrations and run populations
-  # after 'deploy:symlink', 'db:migrate_and_populate'     
+  # after 'deploy:symlink', 'db:migrate_and_populate'
   # see http://github.com/ffmike/db-populate for details on populations
-  
+
   # Enable some common rake database tasks as part of deployments
   ['populate', 'migrate_and_populate', 'migrate', 'reset_sequences'].each do |rake_task|
   desc "Run the db:#{rake_task} rake task on the primary database server"
-  task rake_task.to_sym, :roles => [ :db ], :only => { :primary => true } do
-    rubaidh_run_rake "db:#{rake_task}"
+    task rake_task.to_sym, :roles => [ :db ], :only => { :primary => true } do
+      rubaidh_run_rake "db:#{rake_task}"
+    end
   end
 
   desc <<-DESC
