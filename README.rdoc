@@ -221,7 +221,12 @@ If you use the +db-populate+ gem to handle seed data, you might find these
 tasks helpful:
 
 after "deploy:finalize_update", "db:populate"
-after 'deploy:finalize_update', 'db:migrate_and_populate'
+after 'deploy:finalize_update', 'db:migrate_and_populate'    
+
+There are also cap tasks for two other common database operations:
+
+db:migrate
+db:reset_sequences
 
 === Delayed Jobs
 
