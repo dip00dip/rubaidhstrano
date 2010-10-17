@@ -11,4 +11,11 @@ namespace :deploy do
       exit
     end
   end
+
+  desc "Require positive confirmation of deployment to production"
+  task :ask_production do
+    ask_prompt = "Are you sure you want to work with production? \nIf so, type in \"yes\" (anything else is a \"no\"): ";
+    exit unless Capistrano::CLI.ui.ask(ask_prompt).downcase == 'yes'
+  end
+
 end
