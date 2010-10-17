@@ -27,7 +27,11 @@ set :disable_web_during_migrations,     true
 set :build_gems,                        true
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
-# compress_assets: :jammit, :yui, :none   
+# Make sure git is pushed before deployment
+set :check_revision_on_deploy,          true
+# Require confirmation of production deployments
+set :confirm_production_deploy,         false
+# compress_assets: :jammit, :yui, :none
 set :compress_assets,                   :jammit
 set :enable_delayed_job,                false
 set :database_type,                     "mysql"
@@ -42,4 +46,6 @@ ssh_options[:keys] = [
 
 on :load do
   after_any_deployment "deploy:cleanup" if fetch(:cleanup_on_deploy, false)
+  before_any_deployment "deploy:check_revisions" if fetch(:check_revision_on_deploy, false)
+  before_any_deployment "deploy:ask_production" if fetch(:confirm_production_deploy, false) && (fetch(:stage, 'production') == 'production')
 end
