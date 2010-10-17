@@ -46,6 +46,6 @@ ssh_options[:keys] = [
 
 on :load do
   after_any_deployment "deploy:cleanup" if fetch(:cleanup_on_deploy, false)
-  before_any_deployment "deploy:check_revisions" if fetch(:check_revision_on_deploy, false)
+  before_any_deployment "deploy:check_revision" if fetch(:check_revision_on_deploy, false)
   before_any_deployment "deploy:ask_production" if fetch(:confirm_production_deploy, false) && (fetch(:stage, 'production') == 'production')
 end
