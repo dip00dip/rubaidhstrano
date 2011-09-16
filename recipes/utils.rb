@@ -13,20 +13,12 @@ def rubaidh_run_rake(*tasks)
 end
 
 # There are many tasks that can be considered a deployment.  If you're wanting
-# to run a hook before or after *any* deployment, you'll want to hook into each of them.
+# to run a hook after *any* deployment, you'll want to hook into each of them.
 # This helps you.
 def after_any_deployment(*tasks)
   ["deploy", "deploy:cold", "deploy:migrations"].each do |deployment_task|
     tasks.each do |task|
       after deployment_task, task
-    end
-  end
-end
-
-def before_any_deployment(*tasks)
-  ["deploy", "deploy:cold", "deploy:migrations"].each do |deployment_task|
-    tasks.each do |task|
-      before deployment_task, task
     end
   end
 end

@@ -17,7 +17,14 @@ namespace :assets do
     root_path = File.expand_path(File.dirname(__FILE__) + '/../../../..')
     assets_path = "#{root_path}/public/assets"
     run_locally "jammit"
-    top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
+    case fetch(:sync_assets_via, :none)
+    when :scp
+      top.upload assets_path, "#{current_release}/public", :via => :scp, :recursive => true
+    when :rsync
+      find_servers(:roles => [:app], :except => { :no_release => true }).each do |server|
+        run_locally rsync_command_for(server, "./public/assets")
+      end
+    end
   end
 
   namespace :directories do
@@ -96,4 +103,17 @@ end
 def link(link)
   source, target = link.keys.first, link.values.first
   run "ln -nfs #{target} #{source}"
+end
+
+def rsync_command_for(server, assets_path)
+  "rsync --verbose --progress --stats --compress --rsh='ssh -p #{ssh_port(server)}' #{assets_path}/* #{rsync_host(server)}:#{current_release}/public/assets"
+end
+
+def ssh_port(server)
+  server.port || ssh_options[:port] || 22
+end
+
+def rsync_host(server)
+  user = fetch(:user, nil)
+  user ? "#{user}@#{server.host}" : server.host
 end
