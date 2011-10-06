@@ -22,6 +22,13 @@ task :replicate, :roles => [ :db ], :only => { :primary => true } do
   end
 end
 
-depend :local, :command, "bzcat"
-depend :local, :command, "tar"
-depend :local, :command, "mysql"
+on :load do
+  if fetch(:database_type, "mysql") == "mysql"
+    depend :local, :command, "mysql"
+  else
+    depend :local, :command, "psql"
+  end
+  depend :local, :command, "bzcat"
+  depend :local, :command, "tar"
+end
+
