@@ -16,21 +16,21 @@ on :load do
 
   set(:branch) { fetch(:stage, 'master').to_s }
   set(:rails_env) { fetch(:stage, 'production').to_s }
+  if defined?(Bundler)
+    set :build_gems,                      false
+    # Assume if we're using Bundler that this is Rails 3 and Rails will handle compression
+    set :compress_assets,                   :none
+  else
+    set :build_gems,                      true
+    # compress_assets: :jammit, :yui, :none
+    set :compress_assets,                   :jammit
+  end
 end
 
 # A bunch of features provided by this plugin that I want to enable for most
 # of our applications.
 set :backup_database_before_migrations, true
 set :disable_web_during_migrations,     true
-if defined?(Bundler)
-  set :build_gems,                      false
-  # Assume if we're using Bundler that this is Rails 3 and Rails will handle compression
-  set :compress_assets,                   :none
-else
-  set :build_gems,                      true
-  # compress_assets: :jammit, :yui, :none
-  set :compress_assets,                   :jammit
-end
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
 # sync_assets_via: :scp, :rsync, :none
