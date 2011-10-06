@@ -1,7 +1,7 @@
 # Repository defaults
 set :scm, :git
 set :git_enable_submodules, true
-# set(:repository) { "git@github.com:rubaidh/#{application}.git" }
+set(:repository) { "git@github.com:#{github_user}/#{application}.git" }
 set :deploy_via, :remote_cache
 
 # Deployment configuration
