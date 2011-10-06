@@ -32,7 +32,7 @@ set :compress_assets,                   :jammit
 # sync_assets_via: :scp, :rsync, :none
 set :sync_assets_via,                    :scp
 set :enable_delayed_job,                false
-set :database_type,                     "mysql"
+set :database_type,                     "postgresql"
 
 # SSH options
 ssh_options[:forward_agent] = true
