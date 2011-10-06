@@ -24,13 +24,15 @@ set :backup_database_before_migrations, true
 set :disable_web_during_migrations,     true
 if defined?(Bundler)
   set :build_gems,                      false
+  # Assume if we're using Bundler that this is Rails 3 and Rails will handle compression
+  set :compress_assets,                   :none
 else
   set :build_gems,                      true
+  # compress_assets: :jammit, :yui, :none
+  set :compress_assets,                   :jammit
 end
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
-# compress_assets: :jammit, :yui, :none
-set :compress_assets,                   :jammit
 # sync_assets_via: :scp, :rsync, :none
 set :sync_assets_via,                    :scp
 set :enable_delayed_job,                false
