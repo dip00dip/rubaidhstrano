@@ -3,7 +3,7 @@
 # Repository defaults
 set :scm, :git
 set :git_enable_submodules, true
-set(:repository) { "git@github.com:rubaidh/#{application}.git" }
+# set(:repository) { "git@github.com:rubaidh/#{application}.git" }
 set :deploy_via, :remote_cache
 
 # Deployment configuration
@@ -27,8 +27,8 @@ set :disable_web_during_migrations,     true
 set :build_gems,                        true
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
-# compress_assets: :jammit, :yui, :none   
-set :compress_assets,                   :jammit   
+# compress_assets: :jammit, :yui, :none
+set :compress_assets,                   :jammit
 # sync_assets_via: :scp, :rsync, :none
 set :sync_assets_via,                    :scp
 set :enable_delayed_job,                false
