@@ -1,5 +1,3 @@
-# Some defaults, based upon how we tend to work.
-
 # Repository defaults
 set :scm, :git
 set :git_enable_submodules, true
@@ -24,7 +22,11 @@ end
 # of our applications.
 set :backup_database_before_migrations, true
 set :disable_web_during_migrations,     true
-set :build_gems,                        true
+if defined?(Bundler)
+  set :build_gems,                      false
+else
+  set :build_gems,                      true
+end
 set :tag_on_deploy,                     true
 set :cleanup_on_deploy,                 true
 # compress_assets: :jammit, :yui, :none

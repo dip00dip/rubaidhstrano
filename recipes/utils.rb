@@ -7,7 +7,8 @@ def rubaidh_run_rake(*tasks)
   rake = fetch(:rake, 'rake')
   rails_env = fetch(:rails_env, 'production')
 
-  tasks.each do |task|
+  tasks.each do |task|   
+    # Note that we don't need to do a Rails version check here because bundler/capistrano will take care of adjusting {rake}
     run "cd #{latest_release}; #{rake} RAILS_ENV=#{rails_env} #{task}"
   end
 end
@@ -21,4 +22,4 @@ def after_any_deployment(*tasks)
       after deployment_task, task
     end
   end
-end
+end    

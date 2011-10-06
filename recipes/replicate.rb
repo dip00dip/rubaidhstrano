@@ -12,7 +12,11 @@ task :replicate, :roles => [ :db ], :only => { :primary => true } do
   find_and_execute_task("db:download")
   find_and_execute_task("assets:download")
 
-  run_locally "rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} db:backup:load"
+  if defined?(Bundler)
+    run_locally "bundle exec rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} db:backup:load"
+  else
+    run_locally "rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} db:backup:load"
+  end
 
   unless asset_directories.empty?
     asset_directories.each do |dir|
