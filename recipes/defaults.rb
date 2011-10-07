@@ -3,7 +3,6 @@ set :scm, :git
 set :git_enable_submodules, true
 set(:repository) { "git@github.com:#{github_user}/#{application}.git" }
 set :deploy_via, :remote_cache
-set :user, "webadmin"
 
 # Deployment configuration
 set :daemon_strategy, :passenger
