@@ -22,7 +22,11 @@ task :replicate, :roles => [ :db ], :only => { :primary => true } do
     asset_directories.each do |dir|
       run_locally "rm -rf #{dir}"
     end
-    run_locally "rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} assets:backup:load"
+    if defined?(Bundler)
+      run_locally "bundle exec rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} assets:backup:load"
+    else
+      run_locally "rake RAILS_ENV=#{target_env} SOURCE_ENV=#{source_env} assets:backup:load"
+    end
   end
 end
 
