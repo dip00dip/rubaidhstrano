@@ -10,9 +10,12 @@ set(:user) { application.gsub('_', '') }
 set :use_sudo, false
 
 on :load do
-  role(:app)                  { host }
-  role(:web)                  { host }
-  role(:db, :primary => true) { host }
+  if fetch(:host, nil)
+    role(:app)                  { host }
+    role(:web)                  { host }
+    role(:db, :primary => true) { host }
+    role(:reminder_host)        { host }
+  end
 
   set(:branch) { fetch(:stage, 'master').to_s }
   set(:rails_env) { fetch(:stage, 'production').to_s }
