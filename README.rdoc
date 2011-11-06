@@ -220,13 +220,13 @@ can update the server cron file on deploy:
 If you use the +db-populate+ gem to handle seed data, you might find these
 tasks helpful:
 
-after "deploy:finalize_update", "db:populate"
-after 'deploy:finalize_update', 'db:migrate_and_populate'
+  after "deploy:finalize_update", "db:populate"
+  after 'deploy:finalize_update', 'db:migrate_and_populate'
 
 There are also cap tasks for two other common database operations:
 
-db:migrate
-db:reset_sequences
+  db:migrate
+  db:reset_sequences
 
 === Delayed Jobs
 
@@ -235,6 +235,23 @@ Background task management via the +delayed_job+ gem is also simple:
     set :enable_delayed_job, :true
 
 This depends on having monit on the server to manage the delayed_job daemon.
+ 
+== Reminders
+
+Set a reminder to be shown on next deployment:
+
+  reminders:add
+
+Show all current reminders:
+
+  reminders:show
+
+Clear all reminders:
+
+  reminders:clear
+
+By default, reminders are shown and cleared after any deployment. You can define a reminder_host role to determine
+which server(s) reminders are stored on.
 
 == Thanks
 
@@ -249,6 +266,8 @@ and I'm pretty sure Craig fixed a number of issues in this plugin's previous
 incarnation, +rubaidh_platform+. Thanks, Craig!
 
 Thanks to Kevin Triplett for some Rails 3 fixes and ideas.
+
+Reminders tasks originally from https://github.com/bokmann/dunce-cap.
 
 Copyright (c) 2010-2011 Lark Group, Inc., released under the MIT license
 Portions copyright (c) 2009 Rubaidh Ltd, released under the MIT license
