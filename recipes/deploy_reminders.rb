@@ -23,7 +23,7 @@ namespace :deploy do
 
     desc "clears the current reminder messages"
     task :clear, :roles => :reminder_host do
-      run "rm #{reminder_file}"
+      run "if [ -e #{reminder_file} ]; then rm #{reminder_file}"
     end
   end
 end
